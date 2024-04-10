@@ -1,0 +1,45 @@
+### Create article
+POST http://localhost:8080/api/articles
+Content-Type: application/json
+
+{
+  "body": "Hello, it's my first article!",
+  "title": "My first article",
+  "author": "Dev-Lover"
+}
+
+> {%
+  client.global.set("articleId", response.body.id);
+%}
+
+### Get article
+GET http://localhost:8080/api/articles/{{articleId}}
+
+### Get fake article
+GET http://localhost:8080/api/articles/Fake-article
+
+### Update article
+PUT http://localhost:8080/api/articles/{{articleId}}
+Content-Type: application/json
+
+{
+  "body": "Hello, it's my first article! With some changes.",
+  "title": "My first article with changes",
+  "author": "Senior Dev-Lover"
+}
+
+### Update fake article
+PUT http://localhost:8080/api/articles/Fake-article
+Content-Type: application/json
+
+{
+  "body": "It's the fake article.",
+  "title": "Fake article",
+  "author": "Fake Author"
+}
+
+### Delete article
+DELETE http://localhost:8080/api/articles/{{articleId}}
+
+### Delete fake article
+DELETE http://localhost:8080/api/articles/Fake-article

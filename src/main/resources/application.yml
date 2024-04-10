@@ -1,3 +1,7 @@
+logging:
+  level:
+    io.github.alexengrigup.springmetrics: debug
+
 spring:
   application:
     name: spring-metrics
