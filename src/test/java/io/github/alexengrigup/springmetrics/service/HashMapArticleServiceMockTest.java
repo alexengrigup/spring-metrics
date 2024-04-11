@@ -4,6 +4,7 @@ import io.github.alexengrigup.springmetrics.domain.Article;
 import io.github.alexengrigup.springmetrics.domain.CreatingArticle;
 import io.github.alexengrigup.springmetrics.domain.UpdatingArticle;
 import io.github.alexengrigup.springmetrics.generator.ArticleIdGenerator;
+import io.github.alexengrigup.springmetrics.meter.ArticleOperationMeter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ class HashMapArticleServiceMockTest {
 
     @MockBean
     ArticleIdGenerator articleIdGenerator;
+    @MockBean
+    ArticleOperationMeter articleOperationMeter;
     @MockBean
     Clock clock;
 
