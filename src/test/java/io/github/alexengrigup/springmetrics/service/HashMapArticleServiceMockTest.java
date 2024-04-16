@@ -5,6 +5,7 @@ import io.github.alexengrigup.springmetrics.domain.CreatingArticle;
 import io.github.alexengrigup.springmetrics.domain.UpdatingArticle;
 import io.github.alexengrigup.springmetrics.generator.ArticleIdGenerator;
 import io.github.alexengrigup.springmetrics.meter.ArticleOperationMeter;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -90,6 +93,32 @@ class HashMapArticleServiceMockTest {
         String fakeArticleId = "Fake id";
         Optional<Article> optionalArticle = articleService.findById(fakeArticleId);
         assertTrue(optionalArticle.isEmpty(), () -> "Found article by id: " + fakeArticleId);
+    }
+
+    @Test
+    void should_return_all_articles_onDay() {
+        when(articleIdGenerator.generateId(any(Article.class)))
+                .then(answer -> answer.getArgument(0, Article.class).getTitle());
+        articleService.createAll(List.of(
+                CreatingArticle.builder()
+                        .body("First body.")
+                        .title("First title")
+                        .author("First author")
+                        .build(),
+                CreatingArticle.builder()
+                        .body("Second body.")
+                        .title("Second title")
+                        .author("Second author")
+                        .build()
+        ));
+        List<Article> articles = articleService.findAllOn(createdOn);
+        assertThat(articles)
+                .hasSize(2)
+                .extracting(Article::getId, Article::getBody, Article::getTitle, Article::getAuthor)
+                .containsExactly(
+                        Tuple.tuple("First title", "First body.", "First title", "First author"),
+                        Tuple.tuple("Second title", "Second body.", "Second title", "Second author")
+                );
     }
 
     @Test

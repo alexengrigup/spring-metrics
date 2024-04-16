@@ -13,8 +13,11 @@ import org.springframework.stereotype.Service;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -28,11 +31,24 @@ public class HashMapArticleService implements ArticleService {
 
     @Override
     public Article create(CreatingArticle creatingArticle) {
+        LocalDate createdOn = LocalDate.now(clock);
+        return createOn(creatingArticle, createdOn);
+    }
+
+    @Override
+    public List<Article> createAll(List<CreatingArticle> creatingArticles) {
+        LocalDate createdOn = LocalDate.now(clock);
+        return creatingArticles.stream()
+                .map(creatingArticle -> createOn(creatingArticle, createdOn))
+                .collect(Collectors.toList());
+    }
+
+    private Article createOn(CreatingArticle creatingArticle, LocalDate createdOn) {
         Article newArticle = Article.builder()
                 .body(creatingArticle.getBody())
                 .title(creatingArticle.getTitle())
                 .author(creatingArticle.getAuthor())
-                .createdOn(LocalDate.now(clock))
+                .createdOn(createdOn)
                 .build();
         String id = articleIdGenerator.generateId(newArticle);
         Article article = newArticle.withId(id);
@@ -54,6 +70,13 @@ public class HashMapArticleService implements ArticleService {
         log.debug("Found article with id: {}", articleId);
         articleOperationMeter.incrementReceived();
         return Optional.of(article);
+    }
+
+    @Override
+    public List<Article> findAllOn(LocalDate date) {
+        return articleById.values().stream()
+                .filter(article -> Objects.equals(date, article.getCreatedOn()))
+                .collect(Collectors.toList());
     }
 
     @Override
